@@ -47,6 +47,7 @@
     .input-label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.4px; }
     .input-field, .select-field { width: 100%; background: transparent; border: none; color: var(--text-main); font-size: 20px; font-weight: 700; outline: none; }
     .select-field { background-color: #0f172a; padding: 8px 6px; border-radius: 8px; font-size: 18px; }
+    input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.8); }
     .value-green { font-size: 21px; font-weight: 800; color: #4ade80; padding-top: 6px; }
     .schedule-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
     .period-card { background-color: var(--bg-card); border-radius: 14px; padding: 16px; margin-bottom: 10px; }
@@ -106,11 +107,17 @@
   <div id="sec-inflight" class="section active">
     <div class="panel-green">
       <div class="grid-2">
-        <div class="input-box"><label class="input-label">Start</label><input type="text" id="cruiseStart" class="input-field" value="01:00" maxlength="5" oninput="handleTimeInput(this); calcInflight()" /></div>
-        <div class="input-box"><label class="input-label">End</label><input type="text" id="cruiseEnd" class="input-field" value="11:00" maxlength="5" oninput="handleTimeInput(this); calcInflight()" /></div>
+        <div class="input-box"><label class="input-label">Start</label><input type="time" id="cruiseStart" class="input-field" value="01:00" step="60" oninput="calcInflight()" /></div>
+        <div class="input-box"><label class="input-label">End</label><input type="time" id="cruiseEnd" class="input-field" value="11:00" step="60" oninput="calcInflight()" /></div>
       </div>
       <div class="grid-3">
-        <div class="input-box"><label class="input-label">Pilots</label><select id="restPeriods" class="select-field" onchange="onPeriodsChange()"><option value="3" selected>3</option><option value="4">4</option></select></div>
+        <div class="input-box">
+          <label class="input-label">Pilots</label>
+          <select id="restPeriods" class="select-field" onchange="onPeriodsChange()">
+            <option value="3" selected>3</option>
+            <option value="2">4</option>
+          </select>
+        </div>
         <div class="input-box"><label class="input-label">Switchover</label><select id="switchoverTime" class="select-field" onchange="calcInflight()"><option value="0">0</option><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option></select></div>
         <div class="input-box"><label class="input-label">Available</label><div id="restAvailable" class="value-green">03:20</div></div>
       </div>
@@ -142,7 +149,7 @@
       <div><div class="lbl">Latest</div><div id="endFdpVal" class="med">21:00</div></div>
     </div>
     <div class="grid-2">
-      <div class="input-box"><label class="input-label">Reporting</label><input type="text" id="startTime" class="input-field" value="08:00" maxlength="5" oninput="handleTimeInput(this); calcFDP()" /></div>
+      <div class="input-box"><label class="input-label">Reporting</label><input type="time" id="startTime" class="input-field" value="08:00" step="60" oninput="calcFDP()" /></div>
       <div class="input-box"><label class="input-label">Sectors</label><input type="number" id="sectors" class="input-field" min="1" max="9" value="1" oninput="calcFDP()" /></div>
     </div>
     <div class="input-box" style="margin-bottom: 12px;">
@@ -247,24 +254,12 @@
       btn.textContent = isVisible ? 'Less' : 'More';
     }
 
-    function handleTimeInput(input) {
-      let val = input.value.replace(/\D/g, '');
-      if (val.length > 4) val = val.slice(0, 4);
-      if (val.length >= 3) {
-        input.value = val.slice(0, 2) + ':' + val.slice(2);
-      } else {
-        input.value = val;
-      }
-    }
-
     function parseTimeInput(val) {
       if (!val) return 0;
       const parts = val.split(':');
       if (parts.length < 2) return 0;
       let h = parseInt(parts[0], 10) || 0;
       let m = parseInt(parts[1], 10) || 0;
-      if (h > 23) h = 23;
-      if (m > 59) m = 59;
       return h * 60 + m;
     }
 
