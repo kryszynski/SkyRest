@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -49,13 +49,10 @@
     .select-field { background-color: #0f172a; padding: 8px 6px; border-radius: 8px; font-size: 18px; }
     input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.8); }
     .value-green { font-size: 21px; font-weight: 800; color: #4ade80; padding-top: 6px; }
-    .schedule-container { background-color: rgba(22, 163, 74, 0.08); border: 1px solid var(--green-border); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
-    .period-card { background-color: var(--bg-card); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-    .period-card:last-child { margin-bottom: 0; }
-    .period-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .period-title { font-weight: 700; font-size: 16px; }
+    .schedule-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    .period-card { background-color: var(--bg-card); border-radius: 14px; padding: 16px; border: 1px solid rgba(34, 197, 94, 0.2); }
     .period-times { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 8px; }
-    .time-col span.lbl { display: block; font-size: 11px; color: #64748b; margin-bottom: 4px; }
+    .time-col span.lbl { display: block; font-size: 11px; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
     .time-col span.val { font-size: 18px; font-weight: 800; }
     .time-col span.val.amber { color: var(--amber); cursor: pointer; text-decoration: underline dashed rgba(251, 191, 36, 0.5); }
     .time-col span.val.amber:active { opacity: 0.7; }
@@ -81,7 +78,7 @@
     .switch-btn.on { background-color: #22c55e; }
     .switch-knob { width: 24px; height: 24px; border-radius: 50%; background: #fff; position: absolute; top: 4px; left: 4px; transition: left 0.2s; }
     .switch-btn.on .switch-knob { left: 28px; }
-    .warning-item { background-color: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.45); color: var(--amber); padding: 12px; border-radius: 10px; font-size: 13px; display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .warning-item { background-color: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.45); color: var(--amber); padding: 12px; border-radius: 10px; font-size: 13px; display: flex; align-items: center; gap: 10px; margin-top: 10px; margin-bottom: 12px; }
     .discretion-card { background-color: var(--orange-bg); border: 1px solid var(--orange-border); border-radius: 14px; padding: 16px; margin-top: 16px; font-size: 12px; color: #fed7aa; line-height: 1.5; }
     .discretion-card h4 { color: #fdba74; font-size: 14px; margin-bottom: 8px; }
     .discretion-card ul { margin-left: 16px; margin-top: 6px; margin-bottom: 10px; }
@@ -109,11 +106,11 @@
   <div id="sec-inflight" class="section active">
     <div class="panel-green">
       <div class="grid-2">
-        <div class="input-box"><label class="input-label">Start</label><input type="time" id="cruiseStart" class="input-field" value="01:00" oninput="calcInflight()" /></div>
-        <div class="input-box"><label class="input-label">End</label><input type="time" id="cruiseEnd" class="input-field" value="11:00" oninput="calcInflight()" /></div>
+        <div class="input-box"><label class="input-label">Start</label><input type="time" id="cruiseStart" class="input-field" value="01:00" step="60" oninput="calcInflight()" /></div>
+        <div class="input-box"><label class="input-label">End</label><input type="time" id="cruiseEnd" class="input-field" value="11:00" step="60" oninput="calcInflight()" /></div>
       </div>
       <div class="grid-3">
-        <div class="input-box"><label class="input-label">Periods</label><select id="restPeriods" class="select-field" onchange="onPeriodsChange()"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></div>
+        <div class="input-box"><label class="input-label">Pilots</label><select id="restPeriods" class="select-field" onchange="onPeriodsChange()"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></div>
         <div class="input-box"><label class="input-label">Switchover</label><select id="switchoverTime" class="select-field" onchange="calcInflight()"><option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15" selected>15</option></select></div>
         <div class="input-box"><label class="input-label">Available</label><div id="restAvailable" class="value-green">03:20</div></div>
       </div>
@@ -122,7 +119,7 @@
         <div id="scheduleList"></div>
       </div>
       <div class="info-toggle">
-        <a id="infoToggleBtn" onclick="toggleInfo()">More.. </a>
+        <a id="infoToggleBtn" onclick="toggleInfo()">More..</a>
       </div>
       <div id="infoCardBox" class="info-card">
         <strong>Inflight Rest Requirements (OM-A 7.2.1.2.(2)(e)):</strong>
@@ -145,7 +142,7 @@
       <div><div class="lbl">Latest</div><div id="endFdpVal" class="med">21:00</div></div>
     </div>
     <div class="grid-2">
-      <div class="input-box"><label class="input-label">Reporting</label><input type="time" id="startTime" class="input-field" value="08:00" oninput="calcFDP()" /></div>
+      <div class="input-box"><label class="input-label">Reporting</label><input type="time" id="startTime" class="input-field" value="08:00" step="60" oninput="calcFDP()" /></div>
       <div class="input-box"><label class="input-label">Sectors</label><input type="number" id="sectors" class="input-field" min="1" max="9" value="1" oninput="calcFDP()" /></div>
     </div>
     <div class="input-box" style="margin-bottom: 12px;">
@@ -267,7 +264,7 @@
       }
 
       const millis = targetDate.getTime();
-      const intentUrl = `intent://alarm/new?time=${millis}#Intent;scheme=alarm;package=com.urbandroid.sleep;end;`;
+      const intentUrl = `intent://alarm/new?time=${millis}#Intent;scheme=alarm;package=com.urbandroid.sleep;component=com.urbandroid.sleep/.alarmclock.AlarmClockActivity;S.browser_fallback_url=market://details?id=com.urbandroid.sleep;end;`;
       window.location.href = intentUrl;
     }
 
@@ -299,7 +296,7 @@
         const pStart = startMins + i * eachRest;
         const pEnd = pStart + eachRest;
         const pWake = pEnd - switchover;
-        html += '<div class="period-card"><div class="period-header"><span class="period-title">Period ' + (i + 1) + '</span></div><div class="period-times"><div class="time-col"><span class="lbl">Start</span><span class="val">' + formatTime(pStart) + '</span></div><div class="time-col"><span class="lbl">Wake-up</span><span class="val amber" onclick="openSleepAsAndroid(' + pWake + ')">' + formatTime(pWake) + '</span></div><div class="time-col"><span class="lbl">End</span><span class="val">' + formatTime(pEnd) + '</span></div></div></div>';
+        html += '<div class="period-card"><div class="period-times"><div class="time-col"><span class="lbl">Start</span><span class="val">' + formatTime(pStart) + '</span></div><div class="time-col"><span class="lbl">Wake-up</span><span class="val amber" onclick="openSleepAsAndroid(' + pWake + ')">' + formatTime(pWake) + '</span></div><div class="time-col"><span class="lbl">End</span><span class="val">' + formatTime(pEnd) + '</span></div></div></div>';
       }
       list.innerHTML = html;
     }
