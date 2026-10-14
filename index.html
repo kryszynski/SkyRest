@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -41,7 +41,6 @@
     .section.active { display: block; }
     .panel-green { background-color: var(--green-bg); border: 1px solid var(--green-border); border-radius: 20px; padding: 20px; }
     .panel-purple { background-color: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: 20px; padding: 20px; }
-    .section-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
     .input-box { background-color: var(--bg-card); border-radius: 14px; padding: 14px; }
@@ -51,17 +50,20 @@
     input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.8); }
     .value-green { font-size: 21px; font-weight: 800; color: #4ade80; padding-top: 6px; }
     .schedule-container { background-color: rgba(22, 163, 74, 0.08); border: 1px solid var(--green-border); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
-    .config-caption { font-size: 12px; color: #86efac; margin-bottom: 12px; font-weight: 600; }
     .period-card { background-color: var(--bg-card); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
     .period-card:last-child { margin-bottom: 0; }
     .period-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .period-title { font-weight: 700; font-size: 16px; }
-    .period-badge { font-size: 11px; color: var(--text-muted); background: #0f172a; padding: 3px 8px; border-radius: 6px; }
     .period-times { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 8px; }
     .time-col span.lbl { display: block; font-size: 11px; color: #64748b; margin-bottom: 4px; }
     .time-col span.val { font-size: 18px; font-weight: 800; }
-    .time-col span.val.amber { color: var(--amber); }
-    .info-card { background-color: rgba(30, 41, 59, 0.55); border: 1px solid #334155; border-radius: 14px; padding: 16px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .time-col span.val.amber { color: var(--amber); cursor: pointer; text-decoration: underline dashed rgba(251, 191, 36, 0.5); }
+    .time-col span.val.amber:active { opacity: 0.7; }
+    .info-toggle { text-align: center; margin-top: 10px; margin-bottom: 6px; }
+    .info-toggle a { color: #38bdf8; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; }
+    .info-toggle a:hover { text-decoration: underline; }
+    .info-card { background-color: rgba(30, 41, 59, 0.55); border: 1px solid #334155; border-radius: 14px; padding: 16px; font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 10px; display: none; }
+    .info-card.visible { display: block; }
     .info-card strong { color: #e2e8f0; }
     .info-card ul { margin-left: 16px; margin-top: 8px; }
     .info-card li { margin-bottom: 5px; }
@@ -106,22 +108,23 @@
   </div>
   <div id="sec-inflight" class="section active">
     <div class="panel-green">
-      <div class="section-title">Inflight Rest Schedule</div>
       <div class="grid-2">
-        <div class="input-box"><label class="input-label">Cruise Start</label><input type="time" id="cruiseStart" class="input-field" value="01:00" oninput="calcInflight()" /></div>
-        <div class="input-box"><label class="input-label">Cruise End</label><input type="time" id="cruiseEnd" class="input-field" value="11:00" oninput="calcInflight()" /></div>
+        <div class="input-box"><label class="input-label">Start</label><input type="time" id="cruiseStart" class="input-field" value="01:00" oninput="calcInflight()" /></div>
+        <div class="input-box"><label class="input-label">End</label><input type="time" id="cruiseEnd" class="input-field" value="11:00" oninput="calcInflight()" /></div>
       </div>
       <div class="grid-3">
-        <div class="input-box"><label class="input-label">Rest Periods</label><select id="restPeriods" class="select-field" onchange="onPeriodsChange()"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></div>
-        <div class="input-box"><label class="input-label">Switchover</label><select id="switchoverTime" class="select-field" onchange="calcInflight()"><option value="0">0m</option><option value="5">5m</option><option value="10">10m</option><option value="15" selected>15m</option></select></div>
-        <div class="input-box"><label class="input-label">Rest Available</label><div id="restAvailable" class="value-green">03:20</div></div>
+        <div class="input-box"><label class="input-label">Periods</label><select id="restPeriods" class="select-field" onchange="onPeriodsChange()"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></div>
+        <div class="input-box"><label class="input-label">Switchover</label><select id="switchoverTime" class="select-field" onchange="calcInflight()"><option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15" selected>15</option></select></div>
+        <div class="input-box"><label class="input-label">Available</label><div id="restAvailable" class="value-green">03:20</div></div>
       </div>
       <div id="inflightWarnings"></div>
       <div class="schedule-container">
-        <div id="inflightConfig" class="config-caption"></div>
         <div id="scheduleList"></div>
       </div>
-      <div class="info-card">
+      <div class="info-toggle">
+        <a id="infoToggleBtn" onclick="toggleInfo()">More.. </a>
+      </div>
+      <div id="infoCardBox" class="info-card">
         <strong>Inflight Rest Requirements (OM-A 7.2.1.2.(2)(e)):</strong>
         <ul>
           <li><strong>Minimum consecutive rest:</strong> 90 minutes per crew member</li>
@@ -178,7 +181,7 @@
       </div>
     </div>
     <div id="fdpWarnings"></div>
-    <div class="info-card" style="margin-top: 16px;">
+    <div class="info-card visible" style="margin-top: 16px;">
       <p><strong>Minimum reporting time:</strong> 60 min (WAW), 45 min (other airports)</p>
       <p style="margin-top:4px;"><strong>Post-flight duty:</strong> Minimum 30 minutes</p>
       <p style="margin-top:4px;"><strong>Minimum rest:</strong> Equal to preceding duty or 12h (whichever is greater)</p>
@@ -230,6 +233,7 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
     }
     let acclimatization = 'B', isAugmented = false, augmentedPilots = '3', bunkClass = '1', atHomeBase = true;
+    
     function switchTab(tab) {
       ['inflight', 'fdp', 'rest'].forEach(t => {
         document.getElementById('sec-' + t).classList.toggle('active', t === tab);
@@ -238,13 +242,39 @@
         if (t === tab) btn.classList.add('active-' + t);
       });
     }
+
+    function toggleInfo() {
+      const card = document.getElementById('infoCardBox');
+      const btn = document.getElementById('infoToggleBtn');
+      card.classList.toggle('visible');
+      btn.textContent = card.classList.contains('visible') ? 'Ukryj informacje / OM-A' : 'Więcej informacji / OM-A';
+    }
+
     function formatTime(mins) {
       const normalized = ((Math.floor(mins) % 1440) + 1440) % 1440;
       return String(Math.floor(normalized / 60)).padStart(2, '0') + ':' + String(normalized % 60).padStart(2, '0');
     }
+
+    function openSleepAsAndroid(utcMins) {
+      const now = new Date();
+      const normMins = ((Math.floor(utcMins) % 1440) + 1440) % 1440;
+      const h = Math.floor(normMins / 60);
+      const m = normMins % 60;
+
+      const targetDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), h, m, 0));
+      if (targetDate.getTime() <= now.getTime()) {
+        targetDate.setUTCDate(targetDate.getUTCDate() + 1);
+      }
+
+      const millis = targetDate.getTime();
+      const intentUrl = `intent://alarm/new?time=${millis}#Intent;scheme=alarm;package=com.urbandroid.sleep;end;`;
+      window.location.href = intentUrl;
+    }
+
     function onPeriodsChange() {
       calcInflight();
     }
+
     function calcInflight() {
       const startStr = document.getElementById('cruiseStart').value || '01:00';
       const endStr = document.getElementById('cruiseEnd').value || '11:00';
@@ -260,8 +290,8 @@
       const eachRest = Math.floor(totalCruise / periods);
       if (eachRest < 90) warnings.push('Rest < 90 min (minimum required)');
       document.getElementById('restAvailable').textContent = eachRest > 0 ? formatTime(eachRest) : '00:00';
-      document.getElementById('inflightConfig').textContent = periods === 2 ? '4 pilots (2 at controls, 2 resting)' : periods === 3 ? '3 pilots (2 at controls, 1 resting)' : '4 pilots (individual rotation)';
       document.getElementById('inflightWarnings').innerHTML = warnings.map(w => '<div class="warning-item">&#9888; <span>' + w + '</span></div>').join('');
+      
       const list = document.getElementById('scheduleList');
       if (eachRest <= 0) { list.innerHTML = ''; return; }
       let html = '';
@@ -269,11 +299,11 @@
         const pStart = startMins + i * eachRest;
         const pEnd = pStart + eachRest;
         const pWake = pEnd - switchover;
-        const role = (i === periods - 1) ? 'Final landing' : 'Cruise rotation';
-        html += '<div class="period-card"><div class="period-header"><span class="period-title">Period ' + (i + 1) + '</span><span class="period-badge">' + role + '</span></div><div class="period-times"><div class="time-col"><span class="lbl">Start</span><span class="val">' + formatTime(pStart) + '</span></div><div class="time-col"><span class="lbl">Wake-up</span><span class="val amber">' + formatTime(pWake) + '</span></div><div class="time-col"><span class="lbl">End</span><span class="val">' + formatTime(pEnd) + '</span></div></div></div>';
+        html += '<div class="period-card"><div class="period-header"><span class="period-title">Period ' + (i + 1) + '</span></div><div class="period-times"><div class="time-col"><span class="lbl">Start</span><span class="val">' + formatTime(pStart) + '</span></div><div class="time-col"><span class="lbl">Wake-up</span><span class="val amber" onclick="openSleepAsAndroid(' + pWake + ')">' + formatTime(pWake) + '</span></div><div class="time-col"><span class="lbl">End</span><span class="val">' + formatTime(pEnd) + '</span></div></div></div>';
       }
       list.innerHTML = html;
     }
+
     function getBasicFDP(startMinutes, sectors) {
       const h = startMinutes / 60;
       let base = 11;
