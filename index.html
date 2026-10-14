@@ -45,11 +45,9 @@
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
     .input-box { background-color: var(--bg-card); border-radius: 14px; padding: 14px; }
     .input-label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.4px; }
-    .time-picker-row { display: flex; align-items: center; gap: 4px; }
-    .time-select { background: transparent; border: none; color: var(--text-main); font-size: 20px; font-weight: 700; outline: none; width: 100%; cursor: pointer; }
-    .time-select option { background-color: #0f172a; color: #f8fafc; }
     .input-field, .select-field { width: 100%; background: transparent; border: none; color: var(--text-main); font-size: 20px; font-weight: 700; outline: none; }
     .select-field { background-color: #0f172a; padding: 8px 6px; border-radius: 8px; font-size: 18px; }
+    input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.8); }
     .value-green { font-size: 21px; font-weight: 800; color: #4ade80; padding-top: 6px; }
     .schedule-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
     .period-card { background-color: var(--bg-card); border-radius: 14px; padding: 16px; margin-bottom: 10px; }
@@ -109,26 +107,12 @@
   <div id="sec-inflight" class="section active">
     <div class="panel-green">
       <div class="grid-2">
-        <div class="input-box">
-          <label class="input-label">Start</label>
-          <div class="time-picker-row">
-            <select id="startH" class="time-select" onchange="calcInflight()"></select>
-            <span style="font-size:20px; font-weight:700;">:</span>
-            <select id="startM" class="time-select" onchange="calcInflight()"></select>
-          </div>
-        </div>
-        <div class="input-box">
-          <label class="input-label">End</label>
-          <div class="time-picker-row">
-            <select id="endH" class="time-select" onchange="calcInflight()"></select>
-            <span style="font-size:20px; font-weight:700;">:</span>
-            <select id="endM" class="time-select" onchange="calcInflight()"></select>
-          </div>
-        </div>
+        <div class="input-box"><label class="input-label">Start</label><input type="time" id="cruiseStart" class="input-field" value="01:00" step="60" oninput="calcInflight()" /></div>
+        <div class="input-box"><label class="input-label">End</label><input type="time" id="cruiseEnd" class="input-field" value="11:00" step="60" oninput="calcInflight()" /></div>
       </div>
       <div class="grid-3">
-        <div class="input-box"><label class="input-label">Pilots</label><select id="restPeriods" class="select-field" onchange="onPeriodsChange()"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></div>
-        <div class="input-box"><label class="input-label">Switchover</label><select id="switchoverTime" class="select-field" onchange="calcInflight()"><option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15" selected>15</option></select></div>
+        <div class="input-box"><label class="input-label">Pilots</label><select id="restPeriods" class="select-field" onchange="onPeriodsChange()"><option value="2">2</option><option value="3" selected>3</option></select></div>
+        <div class="input-box"><label class="input-label">Switchover</label><select id="switchoverTime" class="select-field" onchange="calcInflight()"><option value="0">0</option><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option></select></div>
         <div class="input-box"><label class="input-label">Available</label><div id="restAvailable" class="value-green">03:20</div></div>
       </div>
       <div id="inflightWarnings"></div>
@@ -159,14 +143,7 @@
       <div><div class="lbl">Latest</div><div id="endFdpVal" class="med">21:00</div></div>
     </div>
     <div class="grid-2">
-      <div class="input-box">
-        <label class="input-label">Reporting</label>
-        <div class="time-picker-row">
-          <select id="reportH" class="time-select" onchange="calcFDP()"></select>
-          <span style="font-size:20px; font-weight:700;">:</span>
-          <select id="reportM" class="time-select" onchange="calcFDP()"></select>
-        </div>
-      </div>
+      <div class="input-box"><label class="input-label">Reporting</label><input type="time" id="startTime" class="input-field" value="08:00" step="60" oninput="calcFDP()" /></div>
       <div class="input-box"><label class="input-label">Sectors</label><input type="number" id="sectors" class="input-field" min="1" max="9" value="1" oninput="calcFDP()" /></div>
     </div>
     <div class="input-box" style="margin-bottom: 12px;">
@@ -253,33 +230,6 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
     }
-
-    function initTimeSelectors() {
-      const populate = (hId, mId, defH, defM) => {
-        const hSel = document.getElementById(hId);
-        const mSel = document.getElementById(mId);
-        if (!hSel || !mSel) return;
-        for (let i = 0; i < 24; i++) {
-          const opt = document.createElement('option');
-          opt.value = String(i).padStart(2, '0');
-          opt.text = String(i).padStart(2, '0');
-          if (i === defH) opt.selected = true;
-          hSel.appendChild(opt);
-        }
-        for (let i = 0; i < 60; i += 5) {
-          const opt = document.createElement('option');
-          opt.value = String(i).padStart(2, '0');
-          opt.text = String(i).padStart(2, '0');
-          if (i === defM) opt.selected = true;
-          mSel.appendChild(opt);
-        }
-      };
-      populate('startH', 'startM', 1, 0);
-      populate('endH', 'endM', 11, 0);
-      populate('reportH', 'reportM', 8, 0);
-    }
-    initTimeSelectors();
-
     let acclimatization = 'B', isAugmented = false, augmentedPilots = '3', bunkClass = '1', atHomeBase = true;
     
     function switchTab(tab) {
@@ -296,6 +246,15 @@
       const btn = document.getElementById('infoToggleBtn');
       const isVisible = card.classList.toggle('visible');
       btn.textContent = isVisible ? 'Less' : 'More';
+    }
+
+    function parseTimeInput(val) {
+      if (!val) return 0;
+      const parts = val.split(':');
+      if (parts.length < 2) return 0;
+      let h = parseInt(parts[0], 10) || 0;
+      let m = parseInt(parts[1], 10) || 0;
+      return h * 60 + m;
     }
 
     function formatTime(mins) {
@@ -326,16 +285,13 @@
     }
 
     function calcInflight() {
-      const sh = Number(document.getElementById('startH').value);
-      const sm = Number(document.getElementById('startM').value);
-      const eh = Number(document.getElementById('endH').value);
-      const em = Number(document.getElementById('endM').value);
-
+      const startStr = document.getElementById('cruiseStart').value || '01:00';
+      const endStr = document.getElementById('cruiseEnd').value || '11:00';
       const periods = Number(document.getElementById('restPeriods').value);
       const switchover = Number(document.getElementById('switchoverTime').value);
       
-      let startMins = sh * 60 + sm;
-      let endMins = eh * 60 + em;
+      let startMins = parseTimeInput(startStr);
+      let endMins = parseTimeInput(endStr);
       if (endMins <= startMins) endMins += 1440;
       const totalCruise = endMins - startMins;
       const warnings = [];
@@ -379,9 +335,9 @@
     function setPilots(val) { augmentedPilots = val; ['3', '4'].forEach(k => document.getElementById('pilots-' + k).classList.toggle('active-blue', k === val)); calcFDP(); }
     function setBunk(val) { bunkClass = val; ['1', '2', '3'].forEach(k => document.getElementById('bunk-' + k).classList.toggle('active-blue', k === val)); calcFDP(); }
     function calcFDP() {
-      const rh = Number(document.getElementById('reportH').value);
-      const rm = Number(document.getElementById('reportM').value);
-      const startMins = rh * 60 + rm;
+      const startStr = document.getElementById('startTime').value || '08:00';
+      const startMins = parseTimeInput(startStr);
+      const rh = Math.floor(startMins / 60);
 
       const sectors = Math.max(1, Number(document.getElementById('sectors').value) || 1);
       let maxFdp = 13;
